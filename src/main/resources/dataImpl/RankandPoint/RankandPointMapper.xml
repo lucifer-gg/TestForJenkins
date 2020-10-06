@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.oasis.data.RankandPoint.RankandPointServiceMapper">
+    <select id="getRank" resultMap="AuthorHot">
+        select * from authorHot where domain=#{spot} order by hotNum desc;
+    </select>
+    <resultMap id="AuthorHot" type="com.example.oasis.vo.AuthorHot">
+        <result column="authorId" property="authorId"></result>
+        <result column="author" property="author"></result>
+        <result column="domain" property="domain"></result>
+        <result column="hotNum" property="hotNum"></result>
+    </resultMap>
+</mapper>

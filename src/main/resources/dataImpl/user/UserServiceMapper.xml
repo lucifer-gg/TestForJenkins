@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.oasis.data.user.UserServiceMapper">
+    <insert id="createNewAccount">
+        insert into user(username,password)
+        values(#{username},#{password})
+    </insert>
+    <select id="getAccountByName" resultMap="User">
+        select * from user where username=#{username}
+    </select>
+    <update id="changePassword" parameterType="com.example.oasis.vo.UserForm">
+        update user set password = #{password}
+        where username = #{username}
+    </update>
+    <delete id="delete" >
+        delete from user where username=#{username}
+    </delete>
+    <resultMap id="User" type="com.example.oasis.po.User">
+        <id column="id" property="id"></id>
+        <result column="username" property="username"></result>
+        <result column="password" property="password"></result>
+    </resultMap>
+
+</mapper>

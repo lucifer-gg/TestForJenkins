@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.oasis.data.spot.SpotServiceMapper">
+        <insert id="updateSpotItem" parameterType="com.example.oasis.po.SpotItem"
+                useGeneratedKeys="true" keyProperty="spotid">
+            insert ignore into link(spotname,year,author,organization)
+            values (#{spotname},#{year},#{author},#{organization})
+        </insert>
+
+        <insert id="updateSpot" parameterType="com.example.oasis.po.SpotItem"
+                useGeneratedKeys="true" keyProperty="spotid">
+            insert ignore into spot(spotname,spotnum)
+            values (#{spotname},#{spotnum})
+            ON DUPLICATE KEY UPDATE spotnum=spotnum+#{spotnum};
+        </insert>
+
+        <select id="selectSpotChange" resultMap="SpotChange">
+            select count(*) as spotnum,year from(
+            select * from link where spotname=#{spotname})a
+            group by a.year
+        </select>
+
+        <select id="selectAuthorSpot" resultMap="AuthorSpot">
+            select count(*) as spotnum,author from(
+            select * from link where spotname=#{spotname})a
+            group by a.author order by spotnum desc limit 0,5;
+        </select>
+
+        <select id="selectOrganizationSpot" resultMap="OrganizationSpot">
+            select count(*) as spotnum,organization from(
+            select * from link where spotname=#{spotname})a
+            group by a.organization order by spotnum desc limit 0,5;
+        </select>
+
+        <select id="getSpot" resultMap="Spot">
+                select spotname,count(*) as spotnum from link
+                group by spotname order by spotnum desc;
+        </select>
+
+        <select id="RankOrganization" resultMap="OrganizationSpot">
+                select organization,count(*) as spotnum from link
+                group by organization order by spotnum desc limit 0,10;
+        </select>
+
+        <select id="RankSpot" resultMap="Spot">
+                select spotname,count(*) as spotnum from link
+                group by spotname order by spotnum desc limit 0,10;
+        </select>
+
+        <select id="getAuthorByOrag" resultMap="AuthorSpot">
+                select author,count(*) as spotnum from link
+                where organization=#{orag} and author in(select author_name from author) group by author order by spotnum desc limit 0,5;
+        </select>
+
+        <select id="getSpotByOrag" resultMap="Spot">
+                select spotname,count(*) as spotnum from link
+                where organization=#{orag} group by spotname order by spotnum desc limit 0,5;
+        </select>
+
+        <resultMap id="SpotChange" type="com.example.oasis.po.SpotChange"></resultMap>
+        <resultMap id="AuthorSpot" type="com.example.oasis.po.AuthorSpot"></resultMap>
+        <resultMap id="OrganizationSpot" type="com.example.oasis.po.OrganizationSpot"></resultMap>
+        <resultMap id="Spot" type="com.example.oasis.po.Spot"></resultMap>
+
+
+</mapper>

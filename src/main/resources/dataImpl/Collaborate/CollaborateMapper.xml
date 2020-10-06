@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.oasis.data.Collaborate.CollaborateMapper">
+    <select id="findCollaborationByAuthorId" resultMap="Collaboration">
+        select distinct * from collaboration where authorId1=#{authorId} or authorId2=#{authorId} ;
+    </select>
+    <select id="findCollaborationByOrgan" resultMap="Collaboration">
+        select distinct * from collaboration where organ1 like CONCAT('%',#{organ},'%') or organ2 like CONCAT('%',#{organ},'%');
+    </select>
+    <resultMap id="Collaboration" type="com.example.oasis.vo.CollaborateChange">
+        <result column="authorId1" property="authorId1"></result>
+        <result column="authorId2" property="authorId2"></result>
+        <result column="author1" property="author1"></result>
+        <result column="author2" property="author2"></result>
+        <result column="organ1" property="organ1"></result>
+        <result column="organ2" property="organ2"></result>
+        <result column="times" property="times"></result>
+    </resultMap>
+</mapper>

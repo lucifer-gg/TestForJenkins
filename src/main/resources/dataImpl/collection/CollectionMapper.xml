@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.oasis.data.collection.CollectionMapper">
+    <select id="get" resultMap="collection">
+       select * from collection where userId=#{userId};
+    </select>
+    <select id="find" resultType="int">
+        select count(*) from collection where userId=#{userId} and paperId=#{paperId};
+    </select>
+    <delete id="delete">
+        delete from collection where userId=#{userId} and paperId=#{paperId};
+    </delete>
+    <insert id="add" parameterType="com.example.oasis.vo.collection">
+        insert into collection(userId,paperId,title,abstract)
+        values(#{userId},#{paperId},#{title},#{abstract});
+    </insert>
+    <select id="getInf" resultMap="collectionForm">
+        select distinct paperId,title,abstract from paperSpot where paperId=#{paperId}
+    </select>
+    <resultMap id="collection" type="com.example.oasis.vo.collection">
+        <result column="userId" property="userId"></result>
+        <result column="paperId" property="paperId"></result>
+        <result column="title" property="title"></result>
+        <result column="abstract" property="abstract"></result>
+
+    </resultMap>
+    <resultMap id="collectionForm" type="com.example.oasis.vo.collection">
+        <result column="paperId" property="paperId"></result>
+        <result column="title" property="title"></result>
+        <result column="abstract" property="abstract"></result>
+    </resultMap>
+</mapper>

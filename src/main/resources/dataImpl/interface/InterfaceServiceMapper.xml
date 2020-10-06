@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.oasis.data.Interface.InterfaceServiceMapper">
+    <select id="getAuthorDomain" resultMap="Domain">
+        select distinct* from authorDomain where authorId=#{authorId};
+    </select>
+
+    <select id="getAuthorPaper" resultMap="PaperSpot">
+        select * from paperSpot where authorId=#{authorId};
+    </select>
+    <select id="getInf" resultMap="Inf">
+        select * from paperInf where paperId=#{paperId};
+    </select>
+    <select id="getSpotNum" resultType="int">
+        select spotnum from spot where spotname=#{spot};
+    </select>
+    <select id="getPaperSpot" resultMap="PaperSpot">
+        select * from paperSpot where paperId=#{paperId};
+    </select>
+    <select id="getAuthorId" resultType="int">
+        select author_id from produce where paper_id=#{paperId};
+    </select>
+    <select id="getOtherPaper" resultMap="PaperSpot">
+        select paperId,title,pdfLink,abstract,time,authorId from paperSpot
+        where paperId between #{paperId1} and #{paperId2}  and spot = #{spot}
+    </select>
+    <select id="getPaperHot" resultType="Double">
+        select hotNum from paperHot where paperId=#{paperId};
+    </select>
+    <select id="getPaperRank" resultMap="PR">
+        select ph.paperId as paperId,ph.hotNum as hotNum,p.Document_Title as title,p.Article_Citation_Count as citation_counts
+        from paperHot ph,paper p,publish p2
+        where ph.paperId=p.paper_id and p2.paper_id=p.paper_id
+        order by ph.hotNum desc limit 0,11;
+    </select>
+    <select id="getAuthorHot" resultType="Double">
+        select distinct hotNum from authorHot where authorId=#{authorId} and domain=#{spot};
+    </select>
+    <select id="getPaperSpotByAuthor" resultMap="PaperSpot">
+        select paperId,title,pdfLink,abstract from paperSpot where paperId>#{paperId}
+        or  #{paperId}>paperId and  authorId=#{authorId};
+    </select>
+    <select id="getAuthorName" resultType="String">
+        select distinct author_name from author where author_id=#{authorId};
+    </select>
+    <resultMap id="Inf" type="com.example.oasis.vo.PaperInf">
+        <result column="paperId" property="paperId"></result>
+        <result column="authorId" property="authorId"></result>
+        <result column="author" property="author"></result>
+        <result column="title" property="title"></result>
+        <result column="abstract" property="abstracts"></result>
+        <result column="pdfLink" property="pdfLink"></result>
+        <result column="time" property="time"></result>
+        <result column="publishTitle" property="publishTitle"></result>
+        <result column="redNum" property="redNum"></result>
+        <result column="doi" property="doi"></result>
+    </resultMap>
+    <resultMap id="PaperSpot" type="com.example.oasis.vo.PaperSpot">
+        <result column="paperId" property="paperId"></result>
+        <result column="spot" property="spot"></result>
+        <result column="title" property="title"></result>
+        <result column="time" property="time"></result>
+        <result column="pdfLink" property="pdfLink"></result>
+        <result column="abstract" property="abstracts"></result>
+        <result column="authorId" property="authorId"></result>
+    </resultMap>
+    <resultMap id="Domain" type="com.example.oasis.vo.AuthorDomain">
+        <result column="authorId" property="authorId"></result>
+        <result column="author" property="author"></result>
+        <result column="organ" property="organ"></result>
+        <result column="domain" property="domain"></result>
+    </resultMap>
+    <resultMap id="PR" type="com.example.oasis.vo.PaperRank">
+        <result column="paperId" property="paperId"></result>
+        <result column="hotNum" property="hotNum"></result>
+        <result column="title" property="title"></result>
+        <result column="citation_counts" property="citation_counts"></result>
+    </resultMap>
+</mapper>

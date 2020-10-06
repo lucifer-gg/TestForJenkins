@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.oasis.data.DataChange.DataChangeMapper">
+    <select id="getAllAuthorDomain" resultMap="Domain">
+        select distinct* from authorDomain ;
+    </select>
+    <select id="getPaperNum" resultType="int">
+        select count(*) from authorDomain where authorId=#{authorId} and domain=#{spot};
+    </select>
+    <select id="getCollaborateInf" resultMap="Collaborate">
+        select a1.author_id as authorId1,a2.author_id as authorId2,
+        a1.author_name as author1, a2.author_name as author2,
+        a1.author_affiliations as organ1,a2.author_affiliations as organ2
+        from author a1,author a2
+        where a1.author_id =#{authorId1} and a2.author_id=#{authorId2};
+    </select>
+    <select id="findCollaboration" resultType="int">
+        select count(*) from collaboration where authorId1=#{authorId1} and authorId2 =#{authorId2};
+    </select>
+<update id="updateCollaboration">
+    update collaboration set times=times+1 where authorId1=#{authorId1} and authorId2 =#{authorId2};
+</update>
+    <select id="getPaperHotInf" resultMap="PHI">
+        select p1.paper_id as paperId,p1.Article_Citation_Count as counts,p2.Publication_Year as time
+        from paper p1,publish p2
+        where p1.paper_id=p2.paper_id;
+    </select>
+    <insert id="insertPaperHot" parameterType="com.example.oasis.vo.paperHot">
+        insert into paperHot(paperId,hotNum)
+        values(#{paperId},#{hotNum})
+    </insert>
+    <select id="getAuthorNum" resultType="int">
+        select count(distinct authorId) from paperSpot where paperId=#{paperId};
+    </select>
+    <select id="findAuthorIds" resultMap="PA">
+        select distinct paperId as paperId,authorId as authorId from paperSpot;
+    </select>
+    <select id="CollaborateCount" resultType="int">
+        select count(distinct p1.paper_id)  from produce p1,produce p2
+        where p1.author_id=#{authorId1} and p2.author_id=#{authorId1} and p1.paper_id=p2.paper_id;
+    </select>
+    <select id="getPapers" resultType="int">
+        select count(*) from authorDomain where domain=#{spot};
+    </select>
+    <select id="getAuthor" resultMap="Author">
+    select * from author;
+</select>
+    <select id="getPaperSpot" resultMap="PaperSpot">
+        select p1.author_id as authorId,p3.Document_Title as title,p3.paper_id as paperId,
+        p3.PDF_Link as pdfLink,p3.Abstract as abstract,p3.IEEE_terms as spot,p2.Publication_Year as time
+        from produce p1,publish p2,paper p3
+        where p1.paper_id=p2.paper_id and p2.paper_id=p3.paper_id;
+    </select>
+    <insert id="insertHot" parameterType="com.example.oasis.vo.AuthorHot">
+        insert into authorHot(authorId,author,domain,hotNum)
+        values(#{authorId},#{author},#{domain},#{hotNum})
+    </insert>
+    <insert id="insertPaperInf" parameterType="com.example.oasis.vo.PaperInf">
+        insert into paperInf(paperId,authorId,author,title,abstract,pdfLink,time,publishTitle,redNum,doi)
+        values(#{paperId},#{authorId},#{author},#{title},#{abstracts},#{pdfLink},#{time},#{publishTitle},#{redNum},#{doi})
+    </insert>
+    <select id="getPaperInf" resultMap="Paper">
+        select p.paper_id as paperId,a.author_id as authorId,a.author_name as author,
+        p.Document_Title as title,p.Abstract as abstract,p.PDF_Link as pdfLink,
+        p3.Publication_Year as time,p3.Publication_Title as publishTitle,
+        p.Article_Citation_Count as count1,p. Reference_Count as count2,
+        p.DOI as doi
+        from paper p,produce p2,publish p3,author a
+        where p2.paper_id=p.paper_id and p2.author_id=a.author_id
+        and p.paper_id=p3.paper_id;
+    </select>
+    <insert id="insertAuthorDomain" parameterType="com.example.oasis.vo.AuthorDomain">
+    insert into authorDomain(authorId,author,organ,domain)
+    values(#{authorId},#{author},#{organ},#{domain})
+</insert>
+    <insert id="insertPaperSpot" parameterType="com.example.oasis.vo.PaperSpot">
+        insert into paperSpot(paperId,spot,title,pdfLink,abstract,time,authorId)
+        values(#{paperId},#{spot},#{title},#{pdfLink},#{abstracts},#{time},#{authorId})
+    </insert>
+    <insert id="insertCollaborateInf" parameterType="com.example.oasis.vo.CollaborateChange">
+        insert into collaboration(authorId1,authorId2,author1,author2,organ1,organ2,times)
+        values(#{authorId1},#{authorId2},#{author1},#{author2},#{organ1},#{organ2},#{times})
+    </insert>
+    <resultMap id="PA" type="com.example.oasis.vo.PAForm">
+        <result column="authorId" property="authorId"></result>
+        <result column="paperId" property="paperId"></result>
+    </resultMap>
+    <resultMap id="Collaborate" type="com.example.oasis.vo.CollaborateChange">
+        <result column="authorId1" property="authorId1"></result>
+        <result column="authorId2" property="authorId2"></result>
+        <result column="author1" property="author1"></result>
+        <result column="author2" property="author2"></result>
+        <result column="organ1" property="organ1"></result>
+        <result column="organ2" property="organ2"></result>
+    </resultMap>
+    <resultMap id="Domain" type="com.example.oasis.vo.AuthorDomain">
+        <result column="authorId" property="authorId"></result>
+        <result column="author" property="author"></result>
+        <result column="organ" property="organ"></result>
+        <result column="domain" property="domain"></result>
+    </resultMap>
+    <resultMap id="Author" type="com.example.oasis.vo.AuthorChangeOne">
+        <result column="author_id" property="authorId"></result>
+        <result column="author_name" property="author"></result>
+        <result column="author_affiliations" property="organ"></result>
+        <result column="author_keywords" property="domain"></result>
+    </resultMap>
+    <resultMap id="PaperSpot" type="com.example.oasis.vo.AuthorChangeTwo">
+        <result column="authorId" property="authorId"></result>
+        <result column="title" property="title"></result>
+        <result column="paperId" property="paperId"></result>
+        <result column="time" property="time"></result>
+        <result column="spot" property="spot"></result>
+        <result column="pdfLink" property="pdfLink"></result>
+        <result column="abstract" property="Abstract"></result>
+
+    </resultMap>
+    <resultMap id="Paper" type="com.example.oasis.vo.PaperChange">
+        <result column="paperId" property="paperId"></result>
+        <result column="authorId" property="authorId"></result>
+        <result column="author" property="author"></result>
+        <result column="title" property="title"></result>
+        <result column="abstract" property="abstracts"></result>
+        <result column="pdfLink" property="pdfLink"></result>
+        <result column="time" property="time"></result>
+        <result column="publishTitle" property="publishTitle"></result>
+        <result column="count1" property="count1"></result>
+        <result column="count2" property="count2"></result>
+        <result column="doi" property="doi"></result>
+    </resultMap>
+    <resultMap id="PHI" type="com.example.oasis.vo.paperHotInf">
+        <result column="paperId" property="paperId"></result>
+        <result column="time" property="time"></result>
+        <result column="counts" property="counts"></result>
+    </resultMap>
+</mapper>
+
+
+
+
+
+
+
+
+

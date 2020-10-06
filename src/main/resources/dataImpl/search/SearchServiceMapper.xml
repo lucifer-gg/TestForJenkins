@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.oasis.data.search.SearchServiceMapper">
+    <select id="searchByAuthor" resultType="Integer">
+        select pu.publish_id
+        from publish pu,produce p,author a
+        where a.author_name like CONCAT('%',#{author},'%') and a.author_id=p.author_id and p.paper_id=pu.paper_id;
+    </select>
+    <select id="getAuthorsId" resultType="int">
+        select author_id
+        from author
+        where author_name=#{author};
+    </select>
+    <select id="searchByMeeting" resultType="Integer">
+        select p.publish_id
+        from meeting m,publish p
+        where m.Document_Identifier like CONCAT('%',#{meeting},'%') and m.meeting_id=p.meeting_id;
+    </select>
+    <select id="searchByOrgan" resultType="Integer">
+        select p.publish_id
+        from meeting m,publish p
+        where m.publisher like CONCAT('%',#{organ},'%')  and m.meeting_id=p.meeting_id;
+    </select>
+    <select id="searchByTime" resultType="Integer">
+        select publish_id from publish where Publication_Year>=#{startTime} and #{endTime}>=Publication_Year;
+    </select>
+    <select id="searchByKeyWord" resultType="Integer">
+        select publish.publish_id from paper,publish where paper.Document_Title like CONCAT('%',#{keyword},'%') and paper.paper_id=publish.paper_id;
+    </select>
+    <select id="getResult" resultMap="Result" parameterType="java.util.List">
+        select p2.paper_id as paperid,p3.Document_Title as title, p2.Publication_Year as time, p2.Publication_Title as publicationTitle, p3.PDF_Link as pdfLink
+        from publish p2, paper p3
+        where p2.paper_id=p3.paper_id and p2.publish_id in
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+
+    </select>
+    <select id="getAuthors" resultType="string">
+        select a.author_name from author a,produce p
+        where  p.paper_id=#{paperId} and p.author_id=a.author_id;
+    </select>
+    <resultMap id="Result" type="com.example.oasis.vo.SearchResult">
+        <result column="paperid" property="paperid"></result>
+        <result column="title" property="title"></result>
+        <result column="time" property="time"></result>
+        <result column="publicationTitle" property="publicationTitle"></result>
+        <result column="pdfLink" property="pdfLink"></result>
+    </resultMap>
+</mapper>

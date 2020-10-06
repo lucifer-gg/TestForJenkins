@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.oasis.data.update.UpdateServiceMapper">
+
+    <insert id="insertPaper" parameterType="com.example.oasis.vo.PaperVO"
+            useGeneratedKeys="true" keyProperty="paper_id">
+            insert ignore into paper(Document_Title,Date_Added_To_Xplore,Abstract,ISSN,ISBNs,DOI,
+            PDF_Link,IEEE_Terms,INSPEC_Controlled_Terms,INSPEC_Non_Controlled_Terms,Mesh_Terms,Article_Citation_Count,
+            Reference_Count,Online_Date,Issue_Date,Meeting_Date,License)
+            values (#{Document_Title},#{Date_Added_To_Xplore},#{Abstract},#{ISSN},#{ISBNs},#{DOI},
+            #{PDF_Link},#{IEEE_Terms},#{INSPEC_Controlled_Terms},#{INSPEC_Non_Controlled_Terms},#{Mesh_Terms},#{Article_Citation_Count},
+            #{Reference_Count},#{Online_Date},#{Issue_Date},#{Meeting_Date},#{License})
+
+        </insert>
+
+    <insert id="insertAuthor" parameterType="com.example.oasis.vo.AuthorVO"
+            useGeneratedKeys="true" keyProperty="author_id">
+            insert ignore into author(author_name,author_affiliations,author_keywords,Funding_Information)
+            values (#{author_name},#{author_affiliations},#{author_keywords},#{Funding_Information})
+
+        </insert>
+
+    <insert id="insertPublish" parameterType="com.example.oasis.vo.PublishVO"
+            useGeneratedKeys="true" keyProperty="publish_id">
+
+            insert ignore into publish(meeting_id,paper_id,Publication_Title,Publication_Year,Volume,
+            Issue,Start_Page,End_Page)
+            values (#{meeting.meeting_id},#{paper.paper_id},#{Publication_Title},#{Publication_Year},#{Volume},
+            #{Issue},#{Start_Page},#{End_Page})
+
+        </insert>
+
+    <insert id="insertMeeting" parameterType="com.example.oasis.vo.MeetingVO"
+            useGeneratedKeys="true" keyProperty="meeting_id">
+            insert ignore into meeting(publisher,Document_Identifier)
+            values (#{publisher},#{Document_Identifier})
+
+        </insert>
+
+    <insert id="insertProduce" parameterType="com.example.oasis.vo.ProduceVO"
+            useGeneratedKeys="true" keyProperty="create_id">
+            insert ignore into produce(paper_id,author_id)
+            values (#{paper.paper_id},#{author.author_id})
+        </insert>
+
+    <select id="selectPaperByTitle" resultMap="Paper">
+        select * from paper where Document_Title = #{Title}
+    </select>
+
+    <select id="selectAuthorByName" resultMap="Author">
+        select * from author where author_name = #{Name}
+    </select>
+
+    <select id="selectMeeting" resultMap="Meeting">
+        select * from meeting where publisher = #{Publish}
+    </select>
+
+    <resultMap id="Paper" type="com.example.oasis.po.Paper"></resultMap>
+    <resultMap id="Author" type="com.example.oasis.po.Author"></resultMap>
+    <resultMap id="Meeting" type="com.example.oasis.po.Meeting"></resultMap>
+
+
+</mapper>
