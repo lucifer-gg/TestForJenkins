@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="oasis.data.rank.RankMapper">
+
+    <select id="getTopAuthors" resultMap="RankAuthorPO">
+        select auInfo.author_name as authorName, topId.author_id as authorId, num as articleNum
+        from
+            author_info auInfo,
+            (select author_id, count(*) as num
+            from article_to_author atau
+            group by author_id
+            order by num desc
+            limit 5) topId
+        where topId.author_id = auInfo.author_id
+    </select>
+
+    <select id="getTopReferences" resultMap="RankArticlePO">
+        select doc_title as docTitle, doc_id as docId, reference_count as reference
+        from article_info
+        order by reference_count desc
+        limit 5;
+    </select>
+
+    <select id="getTopKeyWords" resultMap="RankKeyWordsPO">
+        select keyword_id as keyWordsId, keyword as keyWords, keyword_search_count as keyWordsSearchTime
+        from keyword_info
+        order by keyword_search_count desc
+        limit 5;
+    </select>
+
+    <select id="getAseTopAffiliations" resultMap="RankAffiliationPO">
+        select afInfo.affiliation_name as affiliationName, ataf.affiliation_id as affiliationId, count(ataf.doc_id) as articleNum
+        from
+            article_to_affiliation ataf inner join affiliation_info afInfo on afInfo.affiliation_id = ataf.affiliation_id,
+            (select distinct doc_id
+            from
+                article_info arInfo,
+                (select publication_id from publication_info where publication_title REGEXP 'ASE' or publication_type = 'ase') ase
+            where arInfo.publication_id = ase.publication_id) aseDocId
+        where ataf.doc_id = aseDocId.doc_id and afInfo.affiliation_name != 'NA'
+        group by ataf.affiliation_id
+        order by articleNum desc
+        limit 5;
+    </select>
+
+    <select id="getIcseTopAffiliations" resultMap="RankAffiliationPO">
+        select afInfo.affiliation_name as affiliationName, ataf.affiliation_id as affiliationId, count(ataf.doc_id) as articleNum
+        from
+            article_to_affiliation ataf inner join affiliation_info afInfo on afInfo.affiliation_id = ataf.affiliation_id,
+            (select distinct doc_id
+            from
+                article_info arInfo,
+                (select publication_id from publication_info where publication_title REGEXP 'ICSE' or publication_type = 'icse') icse
+            where arInfo.publication_id = icse.publication_id) icseDocId
+        where ataf.doc_id = icseDocId.doc_id and afInfo.affiliation_name != 'NA'
+        group by ataf.affiliation_id
+        order by articleNum desc
+        limit 5;
+    </select>
+
+
+    <select id="getTopKeyWordByActivation" resultMap="RankKeyWordByActivationPO">
+        select keyword_info.keyword as keyWord, keyword_info.keyword_id as keyWordId,keyword_info.keyword_activation as keyWordActivation
+        from keyword_info
+        order by keyword_activation desc
+        limit 10;
+
+    </select>
+
+    <select id="getTopAuthorByActivation" resultMap="RankAuthorByActivationPO">
+        select author_name as authorName,author_id as authorId,author_activation as authorActivation
+        from author_info
+        order by author_activation desc
+        limit 10;
+    </select>
+
+    <select id="getTopAffiliationByActivation" resultMap="RankAffiliationByActivationPO">
+        select affiliation_name as affiliationName,affiliation_id as affiliationId,affiliation_activation as affiliationActivation
+        from affiliation_info
+        where affiliation_name!="NA"
+        order by affiliation_activation desc
+        limit 10;
+    </select>
+
+    <select id="getHotTrends" resultMap="HotTrendPO">
+        select keyword, k_info.keyword_id, count(doc_id) as num, keyword_activation
+        from keyword_info k_info, article_to_keyword atk
+        where k_info.keyword_id = atk.keyword_id
+        group by k_info.keyword_id
+        order by num desc
+        limit 10;
+    </select>
+
+    <resultMap id="RankAuthorPO" type="oasis.entity.rank.RankAuthorPO">
+    </resultMap>
+
+    <resultMap id="RankArticlePO" type="oasis.entity.rank.RankArticlePO">
+    </resultMap>
+
+    <resultMap id="RankKeyWordsPO" type="oasis.entity.rank.RankKeyWordPO">
+    </resultMap>
+
+    <resultMap id="RankAffiliationPO" type="oasis.entity.rank.RankAffiliationPO">
+    </resultMap>
+
+    <resultMap id="RankKeyWordByActivationPO" type="oasis.entity.rank.RankKeyWordByActivationPO">
+    </resultMap>
+
+    <resultMap id="RankAuthorByActivationPO" type="oasis.entity.rank.RankAuthorByActivationPO">
+    </resultMap>
+
+    <resultMap id="RankAffiliationByActivationPO" type="oasis.entity.rank.RankAffiliationByActivationPO">
+    </resultMap>
+
+    <resultMap id="HotTrendPO" type="oasis.entity.rank.HotTrendPO">
+        <result property="keyword" column="keyword"/>
+        <result property="keywordId" column="keyword_id"/>
+        <result property="articleNum" column="num"/>
+        <result property="activation" column="keyword_activation"/>
+    </resultMap>
+
+</mapper>

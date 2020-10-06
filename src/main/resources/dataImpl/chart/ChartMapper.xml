@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="oasis.data.chart.ChartMapper">
+
+    <select id="getHindexPerYearByTitle" parameterType="string" resultMap="HindexPerYearPO">
+        select publication_year as publicationYear, publication_hindex as hindex
+        from publication_info
+        where publication_type = #{publicationTitle};
+    </select>
+
+    <resultMap id="HindexPerYearPO" type="oasis.entity.chart.HinderPerYearPO"></resultMap>
+
+    <select id="getAnnualArticles" resultMap="AnnualArticlePO">
+        select publish_year, count(doc_id) as num
+        from article_info
+        where doc_id in ( ${articleIds} )
+        group by publish_year
+        order by publish_year;
+    </select>
+
+    <select id="getKeywordDist" resultMap="KeywordDistPO">
+        select keyword, num
+        from
+            keyword_info k_info,
+            (
+                select keyword_id, count(doc_id) as num
+                from article_to_keyword
+                group by keyword_id
+                order by keyword_id
+            ) atk
+        where k_info.keyword_id in ( ${keywordIds} ) and k_info.keyword_id = atk.keyword_id;
+    </select>
+
+    <select id="getLinkedAuthors" resultType="integer">
+        select linked_author_id from author_map where author_id = #{curAuthorId};
+    </select>
+
+    <select id="getCoopCounts" resultType="integer">
+        select coop_counts from author_map where author_id = #{curAuthorId};
+    </select>
+
+    <select id="getAuthorNodeInfo" resultMap="AuthorNodePO">
+        select author_name, author_activation from author_info where author_id = #{curAuthorId};
+    </select>
+
+    <resultMap id="AnnualArticlePO" type="oasis.entity.chart.AnnualArticlePO">
+        <result property="year" column="publish_year"/>
+        <result property="articleNum" column="num"/>
+    </resultMap>
+
+    <resultMap id="KeywordDistPO" type="oasis.entity.chart.KeywordDistPO">
+        <result property="keyword" column="keyword"/>
+        <result property="articleNum" column="num"/>
+    </resultMap>
+
+    <resultMap id="AnnualHindexPO" type="oasis.entity.chart.AnnualHindexPO">
+        <result property="year" column="publish_year"/>
+        <result property="hindex" column="hindex"/>
+    </resultMap>
+
+    <resultMap id="AuthorNodePO" type="oasis.entity.chart.AuthorNodePO">
+        <result property="name" column="author_name"/>
+        <result property="symbolSize" column="author_activation"/>
+    </resultMap>
+
+</mapper>
