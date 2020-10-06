@@ -84,4 +84,10 @@ public class ShowController {
         return ResponseVO.buildSuccess(rankPaper);
     }
 
+
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    public ResponseVO rankPaper1() {
+        return ResponseVO.buildSuccess("第一次测试成功");
+    }
+
 }
