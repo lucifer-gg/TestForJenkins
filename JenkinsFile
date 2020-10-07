@@ -15,15 +15,7 @@ pipeline {
         stage('build container') {
                     steps {
                         sh '''
-                        CID=$(docker ps -a | grep -w oasis:latest | awk '{print $1}')
-                        if [ -z "$CID"]
-                         then
-                            echo 'has stopped'
-                        else
-                            docker stop $CID
-                            docker rm $CID
-                        fi
-                         docker run -di -p 8081:8081 oasis:latest
+                        sh dockerrun.sh
                         '''
                     }
                 }
