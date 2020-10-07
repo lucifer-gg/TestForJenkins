@@ -87,7 +87,7 @@ public class ShowController {
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public ResponseVO rankPaper1() {
-        return ResponseVO.buildSuccess("第七次测试成功");
+        return ResponseVO.buildSuccess("第八次测试成功");
     }
 
 }
