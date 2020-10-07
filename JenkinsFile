@@ -7,30 +7,23 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '5629358b-eddb-4117-aa55-6e786b1ffff3', url: 'https://github.com/lucifer-gg/TestForJenkins.git']]])
             }
         }
-        stage('build') {
+        stage('build image') {
             steps {
                 sh 'mvn clean package dockerfile:build'
             }
         }
-        stage('Deploy'){
-			steps{
-				echo 'Deploying'
-				sh '''
-					PID=$(ps -ef | grep oasis | grep java | grep -v grep | awk '{ print $2 }')
-					if [ -z "$PID"]
-					then
-						echo Application is already stopped
-					else
-						echo kill $PID
-						kill $PID
-					fi
-				'''
-				withEnv(['JENKINS_NODE_COOKIE=dontkillme']){
-				    sh '''
-    				    nohup java -jar ~/.jenkins/workspace/test03/target/oasis-0.0.1-SNAPSHOT.jar > ~/.jenkins/workspace/log.txt 2>&1 &
-				    '''
-				}
-			}
-		}
+        stage('build container') {
+                    steps {
+                        sh '''
+                        containerId=`docker ps -a | grep -w oasis:latest | awk '{print $1}'`
+                                if ["$containerId" != ""] ; then
+                                    docker stop $containerId
+                                    docker rm $containerId
+                                fi
+                                 docker run -di -p 8081:8081 oasis:latest
+
+                        '''
+                    }
+                }
     }
 }
