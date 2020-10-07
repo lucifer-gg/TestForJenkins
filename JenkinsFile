@@ -7,15 +7,22 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '5629358b-eddb-4117-aa55-6e786b1ffff3', url: 'https://github.com/lucifer-gg/TestForJenkins.git']]])
             }
         }
+        stage('delete old container') {
+                    steps {
+                        sh '''
+                            sh removeDockerContainer.sh
+                        '''
+                        }
+                }
         stage('build image') {
             steps {
                 sh 'mvn clean package dockerfile:build'
             }
         }
-        stage('build container') {
+        stage('run container') {
                     steps {
                         sh '''
-                        sh dockerrun.sh
+                        docker run -di -p 8081:8081 oasis:latest
                         '''
                     }
                 }
